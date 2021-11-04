@@ -1,0 +1,94 @@
+#!/bin/sh
+
+# Stop at any error
+set -e
+
+# Default values
+
+OUTPUT_FILE="vroomed.out"
+C_FILE=$OUTPUT_FILE.c
+
+# Help function
+function vroom_help()
+{
+    echo "Vroom: build the smallest Vlang executable possible for *nix based OS\n"
+    echo "Usage: vroom [path] [OPTION]"
+    echo "  -h, --help: Display this help message"
+    echo "  -o EXECUTABLE: Output executable file"
+}
+
+# Check required packages
+function check_deps()
+{
+    # Check if there is clang installed
+    if [ -z "$(which clang)" ]; then
+        echo "clang not found"
+        exit 1
+    fi
+
+    # Check if strip is installed
+    if [ -z "$(which strip)" ]; then
+        echo "strip not found"
+        exit 1
+    fi
+
+    # Check if v is installed
+    if [ -z "$(which v)" ]; then
+        echo "v not found"
+        exit 1
+    fi
+}
+
+# Check if git is installed
+if ! [ -z "$(which clang)" ]; then
+  # Fancy vroom message
+  VROOM_HASH=$(git log -n 1 --pretty=format:"%h")
+
+  echo "== VROOM - $VROOM_HASH =="
+else
+  echo "== VROOM =="
+fi
+
+# Check if there is args or -h or --help
+if [ -z "$1" ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
+    vroom_help
+    exit 0
+fi
+
+# Check dependencies
+check_deps
+
+echo "Found Clang, strip and V"
+
+# Get the -o option
+if [ "$2" = "-o" ]; then
+    OUTPUT_FILE=$3
+else
+    OUTPUT_FILE=$1.elf
+fi
+
+# Setting the output C file
+C_FILE=$OUTPUT_FILE.c
+
+# Generating C file
+echo "Generating C file..."
+v $1 -skip-unused -o $C_FILE
+
+# Build it with clang
+echo "Building..."
+clang -Oz -s -w -fno-stack-protector -fno-math-errno \
+      -Wl,-z,norelro -Wl,--hash-style=gnu -fdata-sections \
+      -ffunction-sections -Wl,--build-id=none -Wl,--gc-sections \
+      -fno-unwind-tables -fno-asynchronous-unwind-tables $C_FILE -o $OUTPUT_FILE
+
+# Echo strip the executable
+echo "Strip ELF..."
+strip -S --strip-unneeded --remove-section=.note.gnu.gold-version \
+      --remove-section=.comment --remove-section=.note \
+      --remove-section=.note.gnu.build-id --remove-section=.note.ABI-tag $OUTPUT_FILE
+
+# Echo clean up
+echo "Clean up..."
+rm $C_FILE
+
+echo "Complete!"
