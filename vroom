@@ -40,14 +40,7 @@ function check_deps()
 }
 
 # Check if git is installed
-if ! [ -z "$(which clang)" ]; then
-  # Fancy vroom message
-  VROOM_HASH=$(git log -n 1 --pretty=format:"%h")
-
-  echo "== VROOM - $VROOM_HASH =="
-else
-  echo "== VROOM =="
-fi
+echo "== VROOM =="
 
 # Check if there is args or -h or --help
 if [ -z "$1" ] || [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
