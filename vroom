@@ -11,7 +11,7 @@ C_FILE=$OUTPUT_FILE.c
 # Help function
 function vroom_help()
 {
-    echo "Vroom: build the smallest Vlang executable possible for *nix based OS\n"
+    echo "Vroom: build the smallest Vlang executable possible for *nix based OS"
     echo "Usage: vroom [path] [OPTION]"
     echo "  -h, --help: Display this help message"
     echo "  -o EXECUTABLE: Output executable file"
@@ -72,7 +72,9 @@ echo "Building..."
 clang -Oz -s -w -fno-stack-protector -fno-math-errno \
       -Wl,-z,norelro -Wl,--hash-style=gnu -fdata-sections \
       -ffunction-sections -Wl,--build-id=none -Wl,--gc-sections \
-      -fno-unwind-tables -fno-asynchronous-unwind-tables $C_FILE -o $OUTPUT_FILE
+      -fno-unwind-tables -fno-asynchronous-unwind-tables \
+      -lgc \
+      $C_FILE -o $OUTPUT_FILE
 
 # Echo strip the executable
 echo "Strip ELF..."
