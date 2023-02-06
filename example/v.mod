@@ -1,5 +1,5 @@
 Module {
-	name: 'A simple exemple to test Vroom'
+	name: 'A simple example to test Vroom'
 	description: ''
 	version: ''
 	license: ''

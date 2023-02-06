@@ -1,4 +1,11 @@
-# Generated files
-*.c
+# Binaries for programs and plugins
+vroom
+main
+example
+*.exe
+*.exe~
+*.so
+*.dylib
+*.dll
 *.elf
-*.out
+*.c
